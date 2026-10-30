@@ -1,0 +1,52 @@
+{
+  "expo": {
+    "name": "لایتنر آیلتس",
+    "slug": "leitner-ielts",
+    "scheme": "leitner",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "app.leitner.ielts"
+    },
+    "android": {
+      "package": "app.leitner.ielts",
+      "adaptiveIcon": {
+        "backgroundColor": "#0E3B43",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-sqlite",
+      "expo-font",
+      "expo-sharing",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#F4EFE6",
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 160
+        }
+      ],
+      [
+        "expo-notifications",
+        {}
+      ],
+      "expo-secure-store",
+      "expo-asset"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

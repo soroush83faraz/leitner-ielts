@@ -1,0 +1,15 @@
+# Minimal Supabase config for the AI gateway. Run `supabase start` for a local stack.
+project_id = "leitner-ielts"
+
+[auth]
+# Each app install signs in anonymously so the Edge Functions can rate-limit per user.
+enable_anonymous_sign_ins = true
+
+[functions.generate-card]
+verify_jwt = true
+[functions.extract-vocabulary]
+verify_jwt = true
+[functions.generate-practice]
+verify_jwt = true
+[functions.evaluate-writing]
+verify_jwt = true
