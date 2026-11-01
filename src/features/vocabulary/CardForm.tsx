@@ -6,7 +6,7 @@ import { Chip, ChipRow } from '@/components/Chips';
 import { Field } from '@/components/Field';
 import { Banner } from '@/components/Feedback';
 import { Text } from '@/components/Text';
-import { aiService, describeAiError, isAiConfigured } from '@/services/ai';
+import { aiService, describeAiError, useAiConfigured } from '@/services/ai';
 import { useApp } from '@/state/AppProvider';
 import { ensureAiConsent } from '@/state/aiConsent';
 import { space } from '@/theme/tokens';
@@ -26,6 +26,7 @@ export function CardForm({
   termLocked?: boolean;
 }) {
   const { prefs, updatePrefs } = useApp();
+  const aiOn = useAiConfigured();
   const [more, setMore] = useState(!!(value.definitionEn || value.examples.length || value.collocationsText || value.ipa));
   const [ai, setAi] = useState<{ busy: boolean; error: string | null; note: string | null }>({ busy: false, error: null, note: null });
   const set = <K extends keyof CardFormState>(k: K, v: CardFormState[K]) => onChange({ ...value, [k]: v });
@@ -78,11 +79,11 @@ export function CardForm({
           icon="cpu"
           variant="secondary"
           loading={ai.busy}
-          disabled={!isAiConfigured}
+          disabled={!aiOn}
           onPress={suggest}
           hint="فیلدهای خالی را پر می‌کند و چیزی را بدون تأیید شما ذخیره نمی‌کند"
         />
-        {!isAiConfigured ? (
+        {!aiOn ? (
           <Text variant="caption" tone="muted">
             سرویس هوش مصنوعی روی این نسخه تنظیم نشده است؛ کارت را دستی کامل کنید.
           </Text>

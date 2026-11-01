@@ -10,8 +10,9 @@ import { Text } from '@/components/Text';
 import { MAX_DAILY_NEW_TARGET, MIN_DAILY_NEW_TARGET } from '@/constants/leitner';
 import { clearAllData, importBackup, type ImportReport } from '@/database/repositories/backupRepo';
 import { BACKUP_ERROR_FA } from '@/features/backup/schema';
+import { ByokSection } from '@/features/settings/ByokSection';
 import { DEFAULT_PREFERENCES } from '@/features/settings/preferences';
-import { isAiConfigured } from '@/services/ai';
+import { clearOwnKey, useAiConfigured } from '@/services/ai';
 import { exportBackupFile, pickBackupFile } from '@/services/backupFiles';
 import { disableDailyReminder, enableDailyReminder, remindersSupported } from '@/services/reminders';
 import { useApp } from '@/state/AppProvider';
@@ -31,6 +32,7 @@ type Msg = { kind: 'success' | 'danger' | 'info' | 'warn'; text: string } | null
 
 export default function SettingsScreen() {
   const { db, prefs, updatePrefs, bump, now } = useApp();
+  const aiOn = useAiConfigured();
   const { colors } = useTheme();
   const [backupMsg, setBackupMsg] = useState<Msg>(null);
   const [reminderMsg, setReminderMsg] = useState<Msg>(null);
@@ -113,7 +115,7 @@ export default function SettingsScreen() {
   const doClear = async () => {
     const ok = await confirmAsync({
       title: 'پاک کردن همه‌ی داده‌ها؟',
-      message: 'همه‌ی کارت‌ها، جعبه‌ها، تاریخچه‌ی مرور و تمرین و تنظیمات از این دستگاه پاک می‌شود و برگشت‌پذیر نیست. قبلش پشتیبان بگیرید.',
+      message: 'همه‌ی کارت‌ها، جعبه‌ها، تاریخچه‌ی مرور و تمرین، تنظیمات و کلید API ذخیره‌شده از این دستگاه پاک می‌شود و برگشت‌پذیر نیست. قبلش پشتیبان بگیرید.',
       confirmLabel: 'پاک کردن همه',
       destructive: true,
     });
@@ -121,6 +123,7 @@ export default function SettingsScreen() {
     setBusy('clear');
     try {
       await disableDailyReminder();
+      await clearOwnKey();
       await clearAllData(db);
       await updatePrefs(DEFAULT_PREFERENCES);
       bump();
@@ -187,11 +190,10 @@ export default function SettingsScreen() {
 
       <View style={styles.section}>
         <Text variant="heading">هوش مصنوعی</Text>
-        {isAiConfigured ? (
-          <Banner kind="success" text="سرویس هوش مصنوعی تنظیم شده است. فقط وقتی خودتان درخواست بدهید، متن یا واژه ارسال می‌شود." />
-        ) : (
-          <Banner kind="warn" text="سرویس هوش مصنوعی در این نسخه تنظیم نشده است؛ ساخت کارت پیشنهادی، استخراج از متن و بازخورد نوشتن کار نمی‌کنند. مرور، فهرست، تمرین خواندن و شنیدن بدون آن کار می‌کنند." />
-        )}
+        {!aiOn ? (
+          <Banner kind="warn" text="هوش مصنوعی وصل نیست؛ ساخت کارت پیشنهادی، استخراج از متن و بازخورد نوشتن کار نمی‌کنند. مرور، فهرست، تمرین خواندن و شنیدن بدون آن کار می‌کنند." />
+        ) : null}
+        <ByokSection />
         {prefs.aiDisclosureAccepted ? (
           <Button label="پس گرفتن موافقت ارسال به هوش مصنوعی" variant="quiet" block={false} onPress={() => updatePrefs({ aiDisclosureAccepted: false })} />
         ) : null}

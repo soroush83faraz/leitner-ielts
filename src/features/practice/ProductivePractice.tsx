@@ -10,7 +10,7 @@ import { Screen } from '@/components/Screen';
 import { EnText, Text } from '@/components/Text';
 import { saveFinishedPractice } from '@/database/repositories/practiceRepo';
 import { isIncomplete, type VocabularyWithState } from '@/features/vocabulary/model';
-import { aiService, describeAiError, isAiConfigured, isRetryableAiError } from '@/services/ai';
+import { aiService, describeAiError, useAiConfigured, isRetryableAiError } from '@/services/ai';
 import { useApp } from '@/state/AppProvider';
 import { ensureAiConsent } from '@/state/aiConsent';
 import { useDiscardGuard } from '@/state/useDiscardGuard';
@@ -41,6 +41,7 @@ function draw(cards: VocabularyWithState[], mode: Mode, part: 1 | 2 | 3) {
 export function ProductivePractice({ mode, cards, exit }: { mode: Mode; cards: VocabularyWithState[]; exit: () => void }) {
   const { db, now, bump, prefs, updatePrefs } = useApp();
   const online = useOnline();
+  const aiOn = useAiConfigured();
   const [part, setPart] = useState<1 | 2 | 3>(1);
   const [text, setText] = useState('');
   const [feedback, setFeedback] = useState<Evaluation | null>(null);
@@ -153,7 +154,7 @@ export function ProductivePractice({ mode, cards, exit }: { mode: Mode; cards: V
             icon="cpu"
             variant={feedback ? 'secondary' : 'primary'}
             loading={ai.busy}
-            disabled={!isAiConfigured || text.trim().length < 3 || online === false}
+            disabled={!aiOn || text.trim().length < 3 || online === false}
             onPress={evaluate}
             hint="فقط وقتی این دکمه را بزنید، متن شما برای ارزیابی ارسال می‌شود"
           />
@@ -211,10 +212,10 @@ export function ProductivePractice({ mode, cards, exit }: { mode: Mode; cards: V
         editable={!ai.busy}
       />
 
-      {!isAiConfigured ? <Banner kind="warn" text="هوش مصنوعی تنظیم نشده؛ می‌توانید بنویسید و بدون بازخورد ذخیره کنید." /> : null}
-      {online === false && isAiConfigured ? <Banner kind="info" text="آفلاین هستید. بنویسید و ذخیره کنید؛ بازخورد نیاز به اینترنت دارد." /> : null}
+      {!aiOn ? <Banner kind="warn" text="هوش مصنوعی تنظیم نشده؛ می‌توانید بنویسید و بدون بازخورد ذخیره کنید." /> : null}
+      {online === false && aiOn ? <Banner kind="info" text="آفلاین هستید. بنویسید و ذخیره کنید؛ بازخورد نیاز به اینترنت دارد." /> : null}
       {ai.error ? <Banner kind="danger" text={ai.error} actionLabel={ai.retry ? 'تلاش دوباره' : undefined} onAction={evaluate} /> : null}
-      {text.trim() && !ai.error && !feedback && isAiConfigured ? (
+      {text.trim() && !ai.error && !feedback && aiOn ? (
         <Text variant="caption" tone="muted">
           {toPersianDigits(text.trim().split(/\s+/).length)} واژه نوشته‌اید.
         </Text>

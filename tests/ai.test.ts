@@ -208,7 +208,7 @@ describe('anonymous auth', () => {
   });
 });
 
-describe('client code never references AI provider credentials', () => {
+describe('client code never ships AI provider credentials', () => {
   function walk(dir: string): string[] {
     return fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
       const p = path.join(dir, e.name);
@@ -217,10 +217,23 @@ describe('client code never references AI provider credentials', () => {
   }
   const root = path.resolve(__dirname, '..');
   const clientFiles = [...walk(path.join(root, 'src')), path.join(root, 'app.json')];
-  const forbidden = /ANTHROPIC_API_KEY|OPENAI_API_KEY|SERVICE_ROLE|service_role|sk-ant-|api\.anthropic\.com|api\.openai\.com/;
+  // Provider URLs may appear only in the bring-your-own-key module, where the learner's own key is used.
+  const forbidden = /ANTHROPIC_API_KEY|OPENAI_API_KEY|SERVICE_ROLE|service_role|sk-ant-|sk-proj-/;
+  const providerUrl = /api\.anthropic\.com|api\.openai\.com/;
 
-  it('has no provider keys, service-role keys or provider URLs in src/ or app.json', () => {
+  it('has no provider keys or service-role keys in src/ or app.json', () => {
     const offenders = clientFiles.filter((f) => forbidden.test(fs.readFileSync(f, 'utf8')));
+    expect(offenders).toEqual([]);
+  });
+
+  it('talks to a provider directly only from byok.ts', () => {
+    const files = clientFiles.filter((f) => providerUrl.test(fs.readFileSync(f, 'utf8'))).map((f) => path.relative(root, f));
+    expect(files).toEqual(['src/services/ai/byok.ts']);
+  });
+
+  it('never persists or exports a learner key through the database or backup code', () => {
+    const files = [...walk(path.join(root, 'src/database')), ...walk(path.join(root, 'src/features/backup'))];
+    const offenders = files.filter((f) => /secretStore|byok|apiKey/i.test(fs.readFileSync(f, 'utf8')));
     expect(offenders).toEqual([]);
   });
 

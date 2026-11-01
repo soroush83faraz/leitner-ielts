@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { ICON_ENTER, Icon, type IconName } from '@/components/Icon';
 import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
-import { isAiConfigured } from '@/services/ai';
+import { useAiConfigured } from '@/services/ai';
 import { useTheme } from '@/theme/ThemeProvider';
 import { MIN_TOUCH, radius, space } from '@/theme/tokens';
 
@@ -16,6 +16,7 @@ const METHODS: { href: '/add/manual' | '/add/bulk' | '/add/from-text'; icon: Ico
 
 export default function AddIndex() {
   const { colors } = useTheme();
+  const aiOn = useAiConfigured();
   return (
     <Screen title="افزودن واژه" back>
       <Text tone="muted">هر روش را بخواهید انتخاب کنید. هیچ کارتی بدون پیش‌نمایش و تأیید شما ذخیره نمی‌شود.</Text>
@@ -39,8 +40,8 @@ export default function AddIndex() {
                   {m.body}
                 </Text>
                 {m.ai ? (
-                  <Text variant="caption" tone={needsAi && !isAiConfigured ? 'danger' : 'muted'}>
-                    {needsAi && !isAiConfigured ? 'هوش مصنوعی تنظیم نشده؛ این روش فعلاً کار نمی‌کند.' : m.ai}
+                  <Text variant="caption" tone={needsAi && !aiOn ? 'danger' : 'muted'}>
+                    {needsAi && !aiOn ? 'هوش مصنوعی تنظیم نشده؛ این روش فعلاً کار نمی‌کند.' : m.ai}
                   </Text>
                 ) : null}
               </View>

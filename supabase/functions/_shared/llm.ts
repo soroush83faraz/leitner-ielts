@@ -12,7 +12,16 @@ export interface LlmProvider {
   completeJson(args: CompleteArgs): Promise<unknown>;
 }
 
-export type ProviderErrorKind = 'timeout' | 'rate_limited' | 'provider_error' | 'invalid_output' | 'not_configured';
+export type ProviderErrorKind =
+  | 'timeout'
+  | 'rate_limited'
+  | 'provider_error'
+  | 'invalid_output'
+  | 'not_configured'
+  /** The provider rejected the API key (401/403). */
+  | 'unauthorized'
+  /** The request never reached the provider (no network). */
+  | 'offline';
 
 export class ProviderError extends Error {
   constructor(

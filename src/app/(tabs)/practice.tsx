@@ -9,7 +9,7 @@ import { Text } from '@/components/Text';
 import { completedCountsBySkill, SKILLS, type Skill } from '@/database/repositories/practiceRepo';
 import { countVocabulary } from '@/database/repositories/vocabularyRepo';
 import { MIN_WORDS, SKILL_BLURB_FA, SKILL_FA, recommendSkill } from '@/features/practice/recommend';
-import { isAiConfigured } from '@/services/ai';
+import { useAiConfigured } from '@/services/ai';
 import { useData } from '@/state/useData';
 import { useTheme } from '@/theme/ThemeProvider';
 import { MIN_TOUCH, radius, space } from '@/theme/tokens';
@@ -26,6 +26,7 @@ const NEEDS_AI: Record<Skill, string | null> = {
 
 export default function PracticeTab() {
   const { colors } = useTheme();
+  const aiOn = useAiConfigured();
   const { data, error, reload } = useData(async (c) => {
     const weekAgo = toIso(startOfLocalDayMs(parseIso(c.nowIso), c.timeZone, -6));
     const [words, week, total] = await Promise.all([countVocabulary(c.db), completedCountsBySkill(c.db, weekAgo), completedCountsBySkill(c.db)]);
@@ -80,7 +81,7 @@ export default function PracticeTab() {
               </Pressable>
             );
           })}
-          {!isAiConfigured ? <Banner kind="info" text="هوش مصنوعی روی این نسخه تنظیم نشده. خواندن و شنیدن کامل کار می‌کنند؛ در نوشتن و گفتاری می‌توانید متن را بدون بازخورد ذخیره کنید." /> : null}
+          {!aiOn ? <Banner kind="info" text="هوش مصنوعی روی این نسخه تنظیم نشده. خواندن و شنیدن کامل کار می‌کنند؛ در نوشتن و گفتاری می‌توانید متن را بدون بازخورد ذخیره کنید." /> : null}
         </View>
       )}
     </Screen>

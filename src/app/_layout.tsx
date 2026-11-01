@@ -15,6 +15,7 @@ import { useEffect } from 'react';
 import { I18nManager, Platform, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { loadSavedKey } from '@/services/ai';
 import { AppProvider } from '@/state/AppProvider';
 import { useTheme } from '@/theme/ThemeProvider';
 
@@ -62,6 +63,7 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
+    void loadSavedKey();
     ensureNativeRtl();
     if (Platform.OS === 'web' && typeof document !== 'undefined') {
       document.documentElement.setAttribute('dir', 'rtl');

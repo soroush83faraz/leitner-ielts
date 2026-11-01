@@ -7,7 +7,7 @@ import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
 import { saveFinishedPractice } from '@/database/repositories/practiceRepo';
 import type { VocabularyWithState } from '@/features/vocabulary/model';
-import { aiService, describeAiError, isAiConfigured } from '@/services/ai';
+import { aiService, describeAiError, useAiConfigured } from '@/services/ai';
 import { useApp } from '@/state/AppProvider';
 import { ensureAiConsent } from '@/state/aiConsent';
 import { newId } from '@/utils/text';
@@ -19,6 +19,7 @@ type Phase = { name: 'choose' } | { name: 'run'; kind: 'local' | 'ai'; items: Mc
 
 export function ReadingPractice({ cards, exit }: { cards: VocabularyWithState[]; exit: () => void }) {
   const { db, now, bump, prefs, updatePrefs } = useApp();
+  const aiOn = useAiConfigured();
   const [phase, setPhase] = useState<Phase>({ name: 'choose' });
   const [ai, setAi] = useState<{ busy: boolean; error: string | null }>({ busy: false, error: null });
 
@@ -98,8 +99,8 @@ export function ReadingPractice({ cards, exit }: { cards: VocabularyWithState[];
 
       <Text variant="heading">متن کوتاه با هوش مصنوعی</Text>
       <Text tone="muted">یک متن کوتاه با واژه‌های شما و سؤال‌های درک مطلب و هم‌معنایی. نیازمند اینترنت.</Text>
-      <Button label="ساخت متن و سؤال" icon="cpu" variant="secondary" loading={ai.busy} disabled={!isAiConfigured || cards.length === 0} onPress={startAi} />
-      {!isAiConfigured ? <Text variant="caption" tone="muted">هوش مصنوعی روی این نسخه تنظیم نشده است.</Text> : null}
+      <Button label="ساخت متن و سؤال" icon="cpu" variant="secondary" loading={ai.busy} disabled={!aiOn || cards.length === 0} onPress={startAi} />
+      {!aiOn ? <Text variant="caption" tone="muted">هوش مصنوعی روی این نسخه تنظیم نشده است.</Text> : null}
       {ai.error ? <Banner kind="danger" text={ai.error} actionLabel="تلاش دوباره" onAction={startAi} /> : null}
     </Screen>
   );

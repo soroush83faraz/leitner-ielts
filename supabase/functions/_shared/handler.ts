@@ -89,7 +89,9 @@ export function serveOperation(op: Operation): (req: Request) => Promise<Respons
         const kind = e instanceof ProviderError ? e.kind : 'invalid_output'; // schema failures are unusable output
         if (kind === 'timeout') return fail(504, 'timeout', 'timeout');
         if (kind === 'rate_limited') return fail(503, 'provider_error', 'provider_busy', 10);
-        if (kind === 'provider_error' || kind === 'not_configured') return fail(502, 'provider_error', 'provider_error');
+        if (kind === 'provider_error' || kind === 'not_configured' || kind === 'unauthorized' || kind === 'offline') {
+          return fail(502, 'provider_error', 'provider_error');
+        }
         if (attempt === 2) {
           log(502, { reason: 'invalid_output' });
           return fail(502, 'invalid_response', 'invalid_model_output');

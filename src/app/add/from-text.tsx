@@ -11,7 +11,7 @@ import { Screen } from '@/components/Screen';
 import { EnText, Text } from '@/components/Text';
 import { createManyVocabulary, findExistingNormalized, type DuplicateHit } from '@/database/repositories/vocabularyRepo';
 import { TOPIC_FA, type VocabularyInput } from '@/features/vocabulary/model';
-import { aiService, describeAiError, isAiConfigured, isRetryableAiError } from '@/services/ai';
+import { aiService, describeAiError, useAiConfigured, isRetryableAiError } from '@/services/ai';
 import { useApp } from '@/state/AppProvider';
 import { ensureAiConsent } from '@/state/aiConsent';
 import { useDiscardGuard } from '@/state/useDiscardGuard';
@@ -30,6 +30,7 @@ interface Candidate extends ExtractedCandidate {
 
 export default function FromText() {
   const { db, now, bump, prefs, updatePrefs } = useApp();
+  const aiOn = useAiConfigured();
   const { colors } = useTheme();
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
@@ -99,7 +100,7 @@ export default function FromText() {
     }
   };
 
-  if (!isAiConfigured) {
+  if (!aiOn) {
     return (
       <Screen title="استخراج از متن" back>
         <StateView

@@ -23,7 +23,7 @@ import {
   type BulkRow,
 } from '@/features/vocabulary/bulkImport';
 import type { VocabularyInput } from '@/features/vocabulary/model';
-import { aiService, describeAiError, isAiConfigured } from '@/services/ai';
+import { aiService, describeAiError, useAiConfigured } from '@/services/ai';
 import { useApp } from '@/state/AppProvider';
 import { ensureAiConsent } from '@/state/aiConsent';
 import { useDiscardGuard } from '@/state/useDiscardGuard';
@@ -46,6 +46,7 @@ const STATUS_TAG: Record<BulkRow['status'], { label: string; kind: 'good' | 'war
 
 export default function BulkAdd() {
   const { db, now, bump, prefs, updatePrefs } = useApp();
+  const aiOn = useAiConfigured();
   const { colors } = useTheme();
   const [text, setText] = useState('');
   const [rows, setRows] = useState<BulkRow[] | null>(null);
@@ -234,11 +235,11 @@ export default function BulkAdd() {
           icon="cpu"
           variant="secondary"
           loading={ai.running}
-          disabled={!isAiConfigured || toEnrich.length === 0}
+          disabled={!aiOn || toEnrich.length === 0}
           onPress={runEnrichment}
         />
         {ai.running ? <ProgressBar value={ai.done} max={ai.total} label="پیشرفت تکمیل جزئیات" /> : null}
-        {!isAiConfigured ? <Text variant="caption" tone="muted">هوش مصنوعی تنظیم نشده؛ کارت‌ها همین‌طور که هستند ساخته می‌شوند.</Text> : null}
+        {!aiOn ? <Text variant="caption" tone="muted">هوش مصنوعی تنظیم نشده؛ کارت‌ها همین‌طور که هستند ساخته می‌شوند.</Text> : null}
         {ai.message ? <Banner kind="danger" text={`${ai.message} نتایج قبلی حفظ شد.`} actionLabel="ادامه‌ی تکمیل" onAction={runEnrichment} /> : null}
       </View>
 
