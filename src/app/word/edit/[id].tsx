@@ -1,5 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 
 import { Button } from '@/components/Button';
 import { Banner, StateView } from '@/components/Feedback';
@@ -63,7 +64,7 @@ export default function EditWord() {
       await updateVocabulary(db, String(id), formToInput(form), now());
       bump();
       allowLeave();
-      if (router.canGoBack()) router.back();
+      if (Platform.OS !== 'web' && router.canGoBack()) router.back();
       else router.replace('/vocabulary');
     } catch {
       setSaveError('ذخیره انجام نشد. تغییرات شما حفظ شده؛ دوباره تلاش کنید.');

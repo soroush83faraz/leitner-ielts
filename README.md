@@ -3,6 +3,11 @@
 React Native + Expo (SDK 58) + TypeScript, Expo Router, local-first `expo-sqlite`. Persian RTL UI; English text stays LTR.
 AI (card suggestions, text extraction, practice, writing feedback) runs behind Supabase Edge Functions and is **optional**: review, library, bulk import, reading/listening practice, progress and backup all work offline with no AI configured.
 
+## Live web build
+
+https://soroush83faraz.github.io/leitner-ielts/ — the web build runs fully in the browser (SQLite in wasm, data stays in your browser). It is a preview of the mobile app; native features (reminders, share sheet) differ.
+Deployed by `.github/workflows/pages.yml` on every push to `main`.
+
 ## Run
 
 ```bash

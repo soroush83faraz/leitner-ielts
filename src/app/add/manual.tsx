@@ -1,5 +1,6 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
+import { Platform } from 'react-native';
 
 import { Button } from '@/components/Button';
 import { Banner } from '@/components/Feedback';
@@ -41,7 +42,7 @@ export default function ManualAdd() {
         setSeparate(false);
       } else {
         allowLeave();
-        if (router.canGoBack()) router.back();
+        if (Platform.OS !== 'web' && router.canGoBack()) router.back();
         else router.replace('/vocabulary');
       }
     } catch {
